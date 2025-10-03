@@ -1,0 +1,99 @@
+{
+    "version": 1,
+    "name": "Controles",
+    "maps": [
+        {
+            "name": "Movimento",
+            "id": "510470f0-4a5f-4ee9-9c77-52befef1aa2a",
+            "actions": [
+                {
+                    "name": "Mover",
+                    "type": "PassThrough",
+                    "id": "dad91c5e-ab9e-4bee-af30-159b2a8fdbe4",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Saltar",
+                    "type": "Button",
+                    "id": "2e5e1a1f-65ba-4ea5-9240-d317f377665f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "WASD",
+                    "id": "8a160943-a0e5-492a-b1f3-d85d8f90bf9c",
+                    "path": "2DVector(mode=2)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mover",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "c1b6e917-f84e-49c7-8321-5090216a0e6a",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mover",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "07779fb4-4979-472a-89e2-8f36284d6daf",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mover",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "dc2ea93d-a5ea-4722-83a9-072771fdc825",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mover",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "751a44cf-185f-4509-a86b-efade464d13d",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mover",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "d7eda6f1-327e-4a71-8251-fbe713e7edf1",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Saltar",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
