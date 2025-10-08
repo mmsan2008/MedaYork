@@ -22,6 +22,8 @@ public class Movimiento : MonoBehaviour
     public Vector2 dimensionesCaja;
     public bool enSuelo;
 
+    private PlayerDash playerDash;
+
     public Animator animator;
 
 
@@ -53,17 +55,18 @@ public class Movimiento : MonoBehaviour
 
         enSuelo = Physics2D.OverlapBox(controladorSuelo.position, dimensionesCaja, 0f, queEsSuelo);
 
+        playerDash = GetComponent<PlayerDash>();
     }
 
     private void FixedUpdate()
     {
+        if (playerDash != null && playerDash.EstaDashing())
+            return; // No mover al jugador mientras hace dash
 
         rb2d.velocity = new Vector2(direccion.x * velocidadmovimento, rb2d.velocity.y);
-
-
-        animator.SetFloat("movimiento", direccion.x);
-
+        animator.SetFloat("movimiento", Mathf.Abs(direccion.x));
     }
+
 
     private void AjustarRotacion(float direccionX)
     {
@@ -100,6 +103,11 @@ public class Movimiento : MonoBehaviour
         Gizmos.color = Color.yellow;
 
         Gizmos.DrawWireCube(controladorSuelo.position, dimensionesCaja);
+    }
+
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        rb2d.velocity = new Vector2(direccion.x * velocidadmovimento, rb2d.velocity.y);
     }
 
 

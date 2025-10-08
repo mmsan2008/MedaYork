@@ -109,6 +109,15 @@ public partial class @Controles: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Dash"",
+                    ""type"": ""Button"",
+                    ""id"": ""d631d8b8-ab36-4ffa-bc2c-ce073209c605"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -177,6 +186,17 @@ public partial class @Controles: IInputActionCollection2, IDisposable
                     ""action"": ""Saltar"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d0079d4d-aa47-435d-9e45-24726e835529"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -187,6 +207,7 @@ public partial class @Controles: IInputActionCollection2, IDisposable
         m_Movimento = asset.FindActionMap("Movimento", throwIfNotFound: true);
         m_Movimento_Mover = m_Movimento.FindAction("Mover", throwIfNotFound: true);
         m_Movimento_Saltar = m_Movimento.FindAction("Saltar", throwIfNotFound: true);
+        m_Movimento_Dash = m_Movimento.FindAction("Dash", throwIfNotFound: true);
     }
 
     ~@Controles()
@@ -269,6 +290,7 @@ public partial class @Controles: IInputActionCollection2, IDisposable
     private List<IMovimentoActions> m_MovimentoActionsCallbackInterfaces = new List<IMovimentoActions>();
     private readonly InputAction m_Movimento_Mover;
     private readonly InputAction m_Movimento_Saltar;
+    private readonly InputAction m_Movimento_Dash;
     /// <summary>
     /// Provides access to input actions defined in input action map "Movimento".
     /// </summary>
@@ -288,6 +310,10 @@ public partial class @Controles: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Movimento/Saltar".
         /// </summary>
         public InputAction @Saltar => m_Wrapper.m_Movimento_Saltar;
+        /// <summary>
+        /// Provides access to the underlying input action "Movimento/Dash".
+        /// </summary>
+        public InputAction @Dash => m_Wrapper.m_Movimento_Dash;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -320,6 +346,9 @@ public partial class @Controles: IInputActionCollection2, IDisposable
             @Saltar.started += instance.OnSaltar;
             @Saltar.performed += instance.OnSaltar;
             @Saltar.canceled += instance.OnSaltar;
+            @Dash.started += instance.OnDash;
+            @Dash.performed += instance.OnDash;
+            @Dash.canceled += instance.OnDash;
         }
 
         /// <summary>
@@ -337,6 +366,9 @@ public partial class @Controles: IInputActionCollection2, IDisposable
             @Saltar.started -= instance.OnSaltar;
             @Saltar.performed -= instance.OnSaltar;
             @Saltar.canceled -= instance.OnSaltar;
+            @Dash.started -= instance.OnDash;
+            @Dash.performed -= instance.OnDash;
+            @Dash.canceled -= instance.OnDash;
         }
 
         /// <summary>
@@ -391,5 +423,12 @@ public partial class @Controles: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSaltar(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDash(InputAction.CallbackContext context);
     }
 }
