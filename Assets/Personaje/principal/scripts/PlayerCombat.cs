@@ -33,12 +33,12 @@ public class PlayerCombat : MonoBehaviour
 
     // Referencias a otros componentes (ajusta según tu código)
     private Rigidbody2D rb;
-    private Movimiento playerMovement; // Tu script de movimiento
+    private playerMovement playerMovement; // Tu script de movimiento
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        playerMovement = GetComponent<Movimiento>();
+        playerMovement = GetComponent<playerMovement>();
 
         if (blockVisual != null)
             blockVisual.SetActive(false);
@@ -64,6 +64,7 @@ public class PlayerCombat : MonoBehaviour
         if (Input.GetKey(blockKey) && canStartBlock && !isBlocking)
         {
             StartBlock();
+            
         }
         // Mantener bloqueo
         else if (Input.GetKey(blockKey) && isBlocking)
@@ -88,8 +89,8 @@ public class PlayerCombat : MonoBehaviour
         isBlocking = true;
 
         // Activar animación
-       // if (animator != null)
-            //animator.SetBool("IsBlocking", true);
+        animator.SetTrigger("isBlocking");
+
 
         // Mostrar visual del bloqueo
         if (blockVisual != null)
@@ -130,8 +131,8 @@ public class PlayerCombat : MonoBehaviour
         isBlocking = false;
 
         // Desactivar animación
-        //if (animator != null)
-           // animator.SetBool("IsBlocking", false);
+        
+            
 
         // Ocultar visual del bloqueo
         if (blockVisual != null)

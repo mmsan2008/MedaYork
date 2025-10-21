@@ -378,7 +378,7 @@ public class HealthSystem : MonoBehaviour
     void DisableControls()
     {
         // Desactivar scripts de control
-        var movement = GetComponent<Movimiento>();
+        var movement = GetComponent<playerMovement>();
         if (movement != null) movement.enabled = false;
 
         if (playerCombat != null) playerCombat.enabled = false;
@@ -391,7 +391,7 @@ public class HealthSystem : MonoBehaviour
     void EnableControls()
     {
         // Reactivar scripts de control
-        var movement = GetComponent<Movimiento>();
+        var movement = GetComponent<playerMovement>();
         if (movement != null) movement.enabled = true;
 
         if (playerCombat != null) playerCombat.enabled = true;

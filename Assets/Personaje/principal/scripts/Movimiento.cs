@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
 
-public class Movimiento : MonoBehaviour
+public class playerMovement : MonoBehaviour
 {
     public Controles controles;
 
@@ -26,6 +26,7 @@ public class Movimiento : MonoBehaviour
 
     public Animator animator;
 
+    
 
 
 
@@ -56,6 +57,8 @@ public class Movimiento : MonoBehaviour
         enSuelo = Physics2D.OverlapBox(controladorSuelo.position, dimensionesCaja, 0f, queEsSuelo);
 
         playerDash = GetComponent<PlayerDash>();
+
+        animator.SetBool("ensuelo", enSuelo);
     }
 
     private void FixedUpdate()
@@ -65,6 +68,7 @@ public class Movimiento : MonoBehaviour
 
         rb2d.velocity = new Vector2(direccion.x * velocidadmovimento, rb2d.velocity.y);
         animator.SetFloat("movimiento", Mathf.Abs(direccion.x));
+        animator.SetBool("ensuelo", enSuelo);
     }
 
 
@@ -94,8 +98,8 @@ public class Movimiento : MonoBehaviour
         {
             rb2d.AddForce(new Vector2(0, fuerzasalto), ForceMode2D.Impulse);
         }
-        
 
+        animator.SetBool("ensuelo", enSuelo);
     }
 
     private void OnDrawGizmos()
@@ -110,5 +114,7 @@ public class Movimiento : MonoBehaviour
         rb2d.velocity = new Vector2(direccion.x * velocidadmovimento, rb2d.velocity.y);
     }
 
+
+    
 
 }

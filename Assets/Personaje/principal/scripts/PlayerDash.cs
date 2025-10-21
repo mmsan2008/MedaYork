@@ -14,29 +14,29 @@ public class PlayerDash : MonoBehaviour
     private bool isDashing = false;
 
     private Rigidbody2D rb2d;
-    private Movimiento movimiento;
+    private playerMovement playerMovement;
     private Animator animator;
 
     private void Awake()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        movimiento = GetComponent<Movimiento>();
+        playerMovement = GetComponent<playerMovement>();
         animator = GetComponent<Animator>();
     }
 
     private void OnEnable()
     {
-        if (movimiento == null)
-            movimiento = GetComponent<Movimiento>();
+        if (playerMovement == null)
+            playerMovement = GetComponent<playerMovement>();
 
-        if (movimiento != null && movimiento.controles != null)
-            movimiento.controles.Movimento.Dash.performed += _ => TryDash();
+        if (playerMovement != null && playerMovement.controles != null)
+            playerMovement.controles.Movimento.Dash.performed += _ => TryDash();
     }
 
     private void OnDisable()
     {
-        if (movimiento != null && movimiento.controles != null)
-            movimiento.controles.Movimento.Dash.performed -= _ => TryDash();
+        if (playerMovement != null && playerMovement.controles != null)
+            playerMovement.controles.Movimento.Dash.performed -= _ => TryDash();
     }
 
 
@@ -65,7 +65,7 @@ public class PlayerDash : MonoBehaviour
         float originalGravity = rb2d.gravityScale;
         rb2d.gravityScale = 0;
 
-        float dashDirection = movimiento.mirandoderecha ? 1f : -1f;
+        float dashDirection = playerMovement.mirandoderecha ? 1f : -1f;
         rb2d.velocity = new Vector2(dashDirection * dashForce, 0f);
 
         yield return new WaitForSeconds(dashDuration);
