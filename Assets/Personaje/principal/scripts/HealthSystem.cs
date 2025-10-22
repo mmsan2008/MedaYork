@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-
 public class HealthSystem : MonoBehaviour
 {
     [Header("Health Settings")]
@@ -20,7 +19,7 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private bool enableHealthRegen = false;
     [SerializeField] private float regenAmount = 5f;
     [SerializeField] private float regenInterval = 1f;
-    [SerializeField] private float regenDelay = 3f; // Espera después de recibir daño
+    [SerializeField] private float regenDelay = 3f;
     private float timeSinceLastDamage = 0f;
     private Coroutine regenCoroutine;
 
@@ -39,12 +38,16 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private float respawnDelay = 2f;
     [SerializeField] private bool autoRespawn = false;
     [SerializeField] private Vector3 respawnPosition;
+    [SerializeField] private bool destroyOnDeath = false; // NUEVO: para enemigos
 
     [Header("Audio")]
     [SerializeField] private AudioClip damageSound;
     [SerializeField] private AudioClip healSound;
     [SerializeField] private AudioClip deathSound;
     [SerializeField] private AudioSource audioSource;
+
+    [Header("Death Effect (optional)")]
+    [SerializeField] private GameObject deathEffectPrefab; // NUEVO: efecto visual
 
     [Header("Events")]
     public UnityEvent<float> onHealthChanged;
@@ -55,14 +58,12 @@ public class HealthSystem : MonoBehaviour
     public UnityEvent onInvincibilityStart;
     public UnityEvent onInvincibilityEnd;
 
-    // Estados
     private bool isDead = false;
     private bool isInvincible = false;
     private Rigidbody2D rb;
     private PlayerCombat playerCombat;
     private Color originalColor;
 
-    // Propiedades públicas
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
     public float HealthPercentage => currentHealth / maxHealth;
@@ -93,7 +94,6 @@ public class HealthSystem : MonoBehaviour
 
     void Update()
     {
-        // Actualizar regeneración
         if (enableHealthRegen && !isDead)
         {
             timeSinceLastDamage += Time.deltaTime;
@@ -114,7 +114,6 @@ public class HealthSystem : MonoBehaviour
     {
         if (isDead || isInvincible || isInvulnerable) return;
 
-        // Aplicar reducción de daño si está bloqueando
         if (playerCombat != null && playerCombat.IsBlocking())
         {
             damage = playerCombat.TakeDamage(damage);
@@ -123,7 +122,6 @@ public class HealthSystem : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Max(0, currentHealth);
 
-        // Resetear timer de regeneración
         timeSinceLastDamage = 0f;
         if (regenCoroutine != null)
         {
@@ -131,50 +129,32 @@ public class HealthSystem : MonoBehaviour
             regenCoroutine = null;
         }
 
-        // Eventos
         onDamageTaken?.Invoke(damage);
         onHealthChanged?.Invoke(currentHealth);
 
-        // Feedback visual
         if (enableDamageFlash && spriteRenderer != null)
-        {
             StartCoroutine(DamageFlash());
-        }
 
-        // Audio
         PlaySound(damageSound);
 
-        // Knockback
         if (enableKnockback && damageSource != default)
-        {
             ApplyKnockback(damageSource);
-        }
 
-        // Invencibilidad temporal
         if (useDamageInvincibility)
-        {
             StartCoroutine(InvincibilityFrames());
-        }
 
-        // Verificar muerte
         if (currentHealth <= 0 && canDieFromDamage)
-        {
             Die();
-        }
 
-        Debug.Log($"Daño recibido: {damage}. Vida actual: {currentHealth}/{maxHealth}");
+        Debug.Log($"[{gameObject.name}] recibió daño: {damage}. Vida actual: {currentHealth}/{maxHealth}");
     }
 
     public void TakeDamage(float damage, Transform damageSource)
     {
         if (damageSource != null)
-        {
             TakeDamage(damage, damageSource.position);
-        }
         else
-        {
             TakeDamage(damage);
-        }
     }
 
     public void InstantKill()
@@ -202,20 +182,8 @@ public class HealthSystem : MonoBehaviour
             onHealed?.Invoke(actualHealing);
             onHealthChanged?.Invoke(currentHealth);
             PlaySound(healSound);
-
             Debug.Log($"Curación: +{actualHealing}. Vida actual: {currentHealth}/{maxHealth}");
         }
-    }
-
-    public void HealToFull()
-    {
-        Heal(maxHealth);
-    }
-
-    public void SetHealth(float amount)
-    {
-        currentHealth = Mathf.Clamp(amount, 0, maxHealth);
-        onHealthChanged?.Invoke(currentHealth);
     }
 
     IEnumerator RegenerateHealth()
@@ -242,16 +210,38 @@ public class HealthSystem : MonoBehaviour
 
         onDeath?.Invoke();
         PlaySound(deathSound);
+        Debug.Log($"[{gameObject.name}] ha muerto");
 
-        Debug.Log("¡Jugador ha muerto!");
+        // Efecto de muerte visual
+        if (deathEffectPrefab != null)
+            Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
 
-        // Desactivar controles (opcional)
-        DisableControls();
-
-        if (autoRespawn)
+        // Desactivar controles si es el jugador
+        if (CompareTag("Player"))
         {
-            Invoke(nameof(Respawn), respawnDelay);
+            DisableControls();
+
+            if (autoRespawn)
+                Invoke(nameof(Respawn), respawnDelay);
         }
+        else
+        {
+            // Enemigo: destruir después de un tiempo
+            StartCoroutine(DestroyEnemyAfterDeath());
+        }
+    }
+
+    IEnumerator DestroyEnemyAfterDeath()
+    {
+        Animator anim = GetComponent<Animator>();
+        if (anim != null)
+        {
+            anim.SetTrigger("Death");
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        // Destruye todo el prefab raíz (por si el script está en un hijo)
+        Destroy(transform.root.gameObject);
     }
 
     public void Respawn()
@@ -259,35 +249,23 @@ public class HealthSystem : MonoBehaviour
         isDead = false;
         currentHealth = maxHealth;
 
-        // Restaurar posición
         transform.position = respawnPosition;
 
-        // Restaurar visual
         if (spriteRenderer != null)
         {
             spriteRenderer.color = originalColor;
             spriteRenderer.enabled = true;
         }
 
-        // Resetear velocidad
         if (rb != null)
-        {
             rb.velocity = Vector2.zero;
-        }
 
         onRespawn?.Invoke();
         onHealthChanged?.Invoke(currentHealth);
         EnableControls();
 
-        // Invencibilidad temporal al reaparecer
         StartCoroutine(InvincibilityFrames(2f));
-
         Debug.Log("¡Jugador ha reaparecido!");
-    }
-
-    public void SetRespawnPosition(Vector3 position)
-    {
-        respawnPosition = position;
     }
 
     #endregion
@@ -311,7 +289,6 @@ public class HealthSystem : MonoBehaviour
         isInvincible = true;
         onInvincibilityStart?.Invoke();
 
-        // Parpadeo visual
         if (spriteRenderer != null)
         {
             float elapsed = 0f;
@@ -339,58 +316,37 @@ public class HealthSystem : MonoBehaviour
         Vector2 direction = ((Vector2)transform.position - damageSource).normalized;
         rb.velocity = Vector2.zero;
         rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
-
         StartCoroutine(KnockbackDuration());
     }
 
     IEnumerator KnockbackDuration()
     {
-        // Desactivar controles temporalmente
         yield return new WaitForSeconds(knockbackDuration);
-        // Aquí puedes reactivar controles si es necesario
     }
 
     void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null)
-        {
             audioSource.PlayOneShot(clip);
-        }
     }
 
     #endregion
 
     #region Utility Methods
 
-    public void SetInvulnerable(bool invulnerable)
-    {
-        isInvulnerable = invulnerable;
-    }
-
-    public void ModifyMaxHealth(float newMaxHealth)
-    {
-        float healthPercentage = HealthPercentage;
-        maxHealth = Mathf.Max(1, newMaxHealth);
-        currentHealth = maxHealth * healthPercentage;
-        onHealthChanged?.Invoke(currentHealth);
-    }
-
     void DisableControls()
     {
-        // Desactivar scripts de control
         var movement = GetComponent<playerMovement>();
         if (movement != null) movement.enabled = false;
 
         if (playerCombat != null) playerCombat.enabled = false;
 
-        // Detener animaciones
         var animator = GetComponent<Animator>();
         if (animator != null) animator.SetTrigger("Death");
     }
 
     void EnableControls()
     {
-        // Reactivar scripts de control
         var movement = GetComponent<playerMovement>();
         if (movement != null) movement.enabled = true;
 
@@ -398,14 +354,4 @@ public class HealthSystem : MonoBehaviour
     }
 
     #endregion
-
-    // Método para debug en el editor
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(respawnPosition, 0.5f);
-    }
-
-
-
 }
