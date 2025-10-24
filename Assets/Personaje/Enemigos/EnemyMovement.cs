@@ -24,6 +24,19 @@ public class EnemyMovement : MonoBehaviour
         {
             transform.Translate(moveDirection * speed * Time.deltaTime);
 
+            // Voltear sprite según dirección horizontal
+            if (moveDirection.x > 0)
+            {
+                // Va hacia la derecha
+                GetComponent<SpriteRenderer>().flipX = false;
+            }
+            else if (moveDirection.x < 0)
+            {
+                // Va hacia la izquierda
+                GetComponent<SpriteRenderer>().flipX = true;
+            }
+
+
             if (IsFarOutsideCamera())
                 StartCoroutine(FadeAndDestroy());
         }
