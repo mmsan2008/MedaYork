@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7267832089827706256}
   - component: {fileID: 5293139881821485377}
-  - component: {fileID: 2487809388650830256}
   - component: {fileID: 6839583111245633591}
   m_Layer: 0
   m_Name: image-removebg-preview (33)
@@ -86,24 +85,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2487809388650830256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6853600739352301570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e06a8349a258ba547af9c25f3541bd30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  anguloMaximo: 0
-  velocidad: 2
-  tiempoEncendido: 4
-  tiempoApagado: 2
-  colorEncendido: {r: 1, g: 1, b: 1, a: 1}
-  colorApagado: {r: 0.2735849, g: 0.2722944, b: 0.2722944, a: 1}
 --- !u!61 &6839583111245633591
 BoxCollider2D:
   m_ObjectHideFlags: 0

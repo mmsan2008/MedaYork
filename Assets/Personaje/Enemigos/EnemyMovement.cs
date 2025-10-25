@@ -8,7 +8,7 @@ public class EnemyMovement : MonoBehaviour
     private Vector2 moveDirection;
     public Camera mainCamera;
     public int damage = 1;
-
+    public Animator animator;
     private float despawnMargin = 1.2f;
     private bool isDespawning = false;
     private SpriteRenderer spriteRenderer;
@@ -16,6 +16,7 @@ public class EnemyMovement : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        Animator animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -76,6 +77,8 @@ public class EnemyMovement : MonoBehaviour
             {
                 playerHealth.TakeDamage(damage);
             }
+
+            
         }
     }
 }
