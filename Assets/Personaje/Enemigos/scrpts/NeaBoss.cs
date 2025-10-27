@@ -1,141 +1,290 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public class NeaBoss : MonoBehaviour
+public class BossNea : MonoBehaviour
 {
-    [Header("General Settings")]
-    public float maxHealth = 100f;
-    private float currentHealth;
+    [Header("Referencias")]
+    public Transform player;
     public Slider healthBar;
-
-    [Header("Movement")]
-    public float moveSpeed = 3f;
-    public Transform leftLimit;
-    public Transform rightLimit;
-    private bool movingRight = true;
-
-    [Header("Attacks")]
     public GameObject smokePrefab;
     public GameObject knifePrefab;
-    public GameObject chargeEffect;
-    public Transform topSpawnPoint;
-    public Transform bottomSpawnPoint;
+    public Transform attackPoint;
 
-    private bool isAttacking = false;
+    [Header("Stats")]
+    public float maxHealth = 1000f;
+    public float currentHealth;
+    public float moveSpeed = 2f;
+    public float chargeSpeed = 8f;
+
+    [Header("Configuración")]
+    public float minX = -8f;
+    public float maxX = 8f;
+    public float attackCooldown = 3f;
+
+    private BossState currentState = BossState.Moving;
+    private float direction = -1f;
+    private float attackTimer = 0f;
+    private string currentAttack = "";
+    private float attackPhaseTimer = 0f;
+    private bool isFacingRight = false;
+
+    private enum BossState
+    {
+        Moving,
+        Attacking,
+        Charging
+    }
 
     void Start()
     {
         currentHealth = maxHealth;
-        healthBar.maxValue = maxHealth;
-        healthBar.value = currentHealth;
-        StartCoroutine(BossBehavior());
+        UpdateHealthBar();
     }
 
     void Update()
     {
-        healthBar.value = currentHealth;
-    }
+        attackTimer -= Time.deltaTime;
 
-    IEnumerator BossBehavior()
-    {
-        while (currentHealth > 0)
+        switch (currentState)
         {
-            if (!isAttacking)
-            {
-                yield return MovePattern();
-                yield return ChooseAttack();
-            }
-            yield return null;
+            case BossState.Moving:
+                HandleMovement();
+                break;
+            case BossState.Attacking:
+                HandleAttack();
+                break;
+            case BossState.Charging:
+                HandleCharge();
+                break;
         }
-        // Aquí puedes poner animación de muerte o transición
+
+        FlipSprite();
     }
 
-    IEnumerator MovePattern()
+    void HandleMovement()
     {
-        while (!isAttacking)
+        // Mover de izquierda a derecha
+        transform.position += Vector3.right * direction * moveSpeed * Time.deltaTime;
+
+        // Cambiar dirección en los límites
+        if (transform.position.x <= minX || transform.position.x >= maxX)
         {
-            Transform target = movingRight ? rightLimit : leftLimit;
-            transform.position = Vector2.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
+            direction *= -1f;
+        }
 
-            if (Vector2.Distance(transform.position, target.position) < 0.1f)
-            {
-                movingRight = !movingRight;
-                yield break;
-            }
-            yield return null;
+        // Decidir si atacar
+        if (attackTimer <= 0)
+        {
+            StartAttack();
         }
     }
 
-    IEnumerator ChooseAttack()
+    void StartAttack()
     {
-        isAttacking = true;
+        currentState = BossState.Attacking;
+        attackPhaseTimer = 0f;
+
+        // Elegir ataque aleatorio
         int attackIndex = Random.Range(0, 3);
-
         switch (attackIndex)
         {
             case 0:
-                yield return SmokeAttack();
+                currentAttack = "smoke";
                 break;
             case 1:
-                yield return KnifeAttack();
+                currentAttack = "knives";
                 break;
             case 2:
-                yield return ChargeAttack();
+                currentAttack = "charge";
                 break;
         }
 
-        isAttacking = false;
-    }
-
-    IEnumerator SmokeAttack()
-    {
-        yield return new WaitForSeconds(1f);
-        Instantiate(smokePrefab, topSpawnPoint.position, Quaternion.identity);
-        yield return new WaitForSeconds(2f);
-        Instantiate(smokePrefab, bottomSpawnPoint.position, Quaternion.identity);
-        yield return new WaitForSeconds(2f);
-    }
-
-    IEnumerator KnifeAttack()
-    {
-        int knifeCount = 10;
-        for (int i = 0; i < knifeCount; i++)
+        // Mirar hacia el jugador
+        if (player != null)
         {
-            Vector2 pos = new Vector2(Random.Range(-8f, 8f), topSpawnPoint.position.y);
-            Instantiate(knifePrefab, pos, Quaternion.identity);
+            direction = player.position.x > transform.position.x ? 1f : -1f;
         }
-        yield return new WaitForSeconds(3f);
+
+        Debug.Log("Boss usa ataque: " + currentAttack);
     }
 
-    IEnumerator ChargeAttack()
+    void HandleAttack()
     {
-        yield return new WaitForSeconds(1f); // carga
-        Vector2 dir = movingRight ? Vector2.right : Vector2.left;
-        float chargeTime = 1.5f;
-        float chargeSpeed = 15f;
+        attackPhaseTimer += Time.deltaTime;
 
-        float timer = 0;
-        while (timer < chargeTime)
+        switch (currentAttack)
         {
-            transform.Translate(dir * chargeSpeed * Time.deltaTime);
-            timer += Time.deltaTime;
-            yield return null;
+            case "smoke":
+                ExecuteSmokeAttack();
+                break;
+            case "knives":
+                ExecuteKnivesAttack();
+                break;
+            case "charge":
+                ExecuteChargeAttack();
+                break;
         }
-        yield return new WaitForSeconds(1f);
     }
 
-    public void TakeDamage(float amount)
+    void ExecuteSmokeAttack()
     {
-        currentHealth -= amount;
-        if (currentHealth <= 0) Die();
+        // Humo arriba en 0.5 segundos
+        if (attackPhaseTimer >= 0.5f && attackPhaseTimer < 0.6f)
+        {
+            SpawnSmoke(true); // true = arriba
+        }
+
+        // Humo abajo en 1.5 segundos
+        if (attackPhaseTimer >= 1.5f && attackPhaseTimer < 1.6f)
+        {
+            SpawnSmoke(false); // false = abajo
+        }
+
+        // Terminar ataque
+        if (attackPhaseTimer >= 3f)
+        {
+            EndAttack();
+        }
+    }
+
+    void SpawnSmoke(bool isTop)
+    {
+        if (smokePrefab != null)
+        {
+            float yPos = isTop ? 3f : -3f;
+            GameObject smoke = Instantiate(smokePrefab, new Vector3(minX - 1f, yPos, 0), Quaternion.identity);
+            smoke.GetComponent<SmokeProjectile>().Initialize(isTop);
+        }
+    }
+
+    void ExecuteKnivesAttack()
+    {
+        // Lanzar cuchillos en 0.5 segundos
+        if (attackPhaseTimer >= 0.5f && attackPhaseTimer < 0.6f)
+        {
+            SpawnKnives();
+        }
+
+        // Terminar ataque
+        if (attackPhaseTimer >= 2.5f)
+        {
+            EndAttack();
+        }
+    }
+
+    void SpawnKnives()
+    {
+        if (knifePrefab != null)
+        {
+            // Crear patrón de cuchillos con huecos aleatorios
+            int gap1 = Random.Range(1, 4);
+            int gap2 = Random.Range(5, 8);
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (i != gap1 && i != gap2)
+                {
+                    float xPos = minX + (maxX - minX) * (i / 7f);
+                    Instantiate(knifePrefab, new Vector3(xPos, 6f, 0), Quaternion.identity);
+                }
+            }
+        }
+    }
+
+    void ExecuteChargeAttack()
+    {
+        // Cambiar a estado de carga inmediatamente
+        if (attackPhaseTimer >= 0.5f && attackPhaseTimer < 0.6f)
+        {
+            currentState = BossState.Charging;
+            attackPhaseTimer = 0f;
+        }
+    }
+
+    void HandleCharge()
+    {
+        attackPhaseTimer += Time.deltaTime;
+
+        // Moverse rápido
+        transform.position += Vector3.right * direction * chargeSpeed * Time.deltaTime;
+
+        // Rebotar en los bordes
+        if (transform.position.x <= minX || transform.position.x >= maxX)
+        {
+            direction *= -1f;
+        }
+
+        // Verificar colisión con jugador
+        if (player != null)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+            if (distance < 1f)
+            {
+                HealthSystem playerHealth = player.GetComponent<HealthSystem>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(25);
+                }
+            }
+        }
+
+        // Terminar carga después de 3 segundos
+        if (attackPhaseTimer >= 3f)
+        {
+            EndAttack();
+        }
+    }
+
+    void EndAttack()
+    {
+        currentState = BossState.Moving;
+        attackTimer = attackCooldown;
+        currentAttack = "";
+    }
+
+    void FlipSprite()
+    {
+        if ((direction > 0 && !isFacingRight) || (direction < 0 && isFacingRight))
+        {
+            isFacingRight = !isFacingRight;
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
+        }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0, currentHealth);
+        UpdateHealthBar();
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void UpdateHealthBar()
+    {
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth / maxHealth;
+        }
     }
 
     void Die()
     {
-        // Animación y lógica de muerte
-        Debug.Log("Nea derrotada");
+        Debug.Log("¡Boss derrotado!");
+        // Aquí puedes agregar animación de muerte, drop de items, etc.
+        Destroy(gameObject);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(new Vector3(minX, transform.position.y, 0),
+                       new Vector3(maxX, transform.position.y, 0));
     }
 }
