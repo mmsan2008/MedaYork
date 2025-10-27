@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 96c7cbc7240f4e645852d82659c9d848
+guid: 783f78edb8c01b84eab65d2ffd83ddc5
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -121,18 +121,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: humovape
+  - name: varilla
     originalName: 
-    pivot: {x: 0.5090909, y: -1.6000001}
+    pivot: {x: 0.5416667, y: -0.17021276}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 55
-      height: 15
-    spriteID: b3c30899edd803d48853bfcc8e249e72
+      width: 24
+      height: 47
+    spriteID: f290f4cff2b65e24aa85e05b2ca1d44c
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -144,21 +144,21 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: 951364681
-    name: humovape
+    guid: 499016861
+    name: varilla
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: humovape
+    - name: varilla
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 4
-        y: 24
-        width: 55
-        height: 15
-      spriteId: b3c30899edd803d48853bfcc8e249e72
+        x: 19
+        y: 8
+        width: 24
+        height: 47
+      spriteId: f290f4cff2b65e24aa85e05b2ca1d44c
     linkedCells: []
     parentIndex: -1
   platformSettings:

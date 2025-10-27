@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 96c7cbc7240f4e645852d82659c9d848
+guid: 93a2eddc3be62bd42a868a92c2a0ed0b
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -121,18 +121,78 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: humovape
+  - name: Frame_0
     originalName: 
-    pivot: {x: 0.5090909, y: -1.6000001}
+    pivot: {x: 0.5, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 43
+      y: 4
+      width: 24
+      height: 63
+    spriteID: d0f484eeeb9604241a5b27bfa4bfe2e2
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 43, y: 4}
+  - name: Frame_1
+    originalName: 
+    pivot: {x: 0.5769231, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 75
+      width: 26
+      height: 63
+    spriteID: 0a3613782a17a1c44b9cdb535a7e4c3c
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 75}
+  - name: Frame_2
+    originalName: 
+    pivot: {x: 0.48, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 146
+      width: 25
+      height: 63
+    spriteID: 3c8b9392d24bd4343b8f522a4ada07fd
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 146}
+  - name: Frame_3
+    originalName: 
+    pivot: {x: 0.54838705, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 55
-      height: 15
-    spriteID: b3c30899edd803d48853bfcc8e249e72
+      width: 31
+      height: 63
+    spriteID: 24e90799d0fc2b542ac67604958c47e0
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -141,24 +201,80 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 4}
+  - name: Frame_4
+    originalName: 
+    pivot: {x: 0.54545456, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 43
+      y: 75
+      width: 22
+      height: 63
+    spriteID: 5aedf7b4248c3ba4b852706654891c19
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 43, y: 75}
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: 951364681
-    name: humovape
+    guid: 427500524
+    name: Estudiante2
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: humovape
+    - name: Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 4
-        y: 24
-        width: 55
-        height: 15
-      spriteId: b3c30899edd803d48853bfcc8e249e72
+        x: 20
+        y: 0
+        width: 24
+        height: 63
+      spriteId: d0f484eeeb9604241a5b27bfa4bfe2e2
+    - name: Frame_1
+      frameIndex: 1
+      additiveSortOrder: 0
+      cellRect:
+        x: 17
+        y: 0
+        width: 26
+        height: 63
+      spriteId: 0a3613782a17a1c44b9cdb535a7e4c3c
+    - name: Frame_2
+      frameIndex: 2
+      additiveSortOrder: 0
+      cellRect:
+        x: 20
+        y: 0
+        width: 25
+        height: 63
+      spriteId: 3c8b9392d24bd4343b8f522a4ada07fd
+    - name: Frame_3
+      frameIndex: 3
+      additiveSortOrder: 0
+      cellRect:
+        x: 15
+        y: 0
+        width: 31
+        height: 63
+      spriteId: 24e90799d0fc2b542ac67604958c47e0
+    - name: Frame_4
+      frameIndex: 4
+      additiveSortOrder: 0
+      cellRect:
+        x: 20
+        y: 0
+        width: 22
+        height: 63
+      spriteId: 5aedf7b4248c3ba4b852706654891c19
     linkedCells: []
     parentIndex: -1
   platformSettings:

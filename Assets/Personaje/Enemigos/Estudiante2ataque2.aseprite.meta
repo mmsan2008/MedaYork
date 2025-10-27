@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 96c7cbc7240f4e645852d82659c9d848
+guid: 26dd3ad26edd5a642b5f0dde47e87887
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -121,18 +121,58 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: humovape
+  - name: Frame_0
     originalName: 
-    pivot: {x: 0.5090909, y: -1.6000001}
+    pivot: {x: 0.5, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 147
+      width: 24
+      height: 63
+    spriteID: 8459afda72d372248b87a32848915897
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 147}
+  - name: Frame_1
+    originalName: 
+    pivot: {x: 0.4047619, y: 0}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 76
+      width: 42
+      height: 63
+    spriteID: ce5e070f3400880498f7d43e76d5d62f
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 76}
+  - name: Frame_2
+    originalName: 
+    pivot: {x: 0.6666667, y: 0}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 55
-      height: 15
-    spriteID: b3c30899edd803d48853bfcc8e249e72
+      width: 42
+      height: 64
+    spriteID: df41cbfa338ea8742895fa34cbf8cc77
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -144,21 +184,39 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: 951364681
-    name: humovape
+    guid: -1997199183
+    name: Estudiante2ataque2
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: humovape
+    - name: Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
+        x: 20
+        y: 0
+        width: 24
+        height: 63
+      spriteId: 8459afda72d372248b87a32848915897
+    - name: Frame_1
+      frameIndex: 1
+      additiveSortOrder: 0
+      cellRect:
+        x: 15
+        y: 0
+        width: 42
+        height: 63
+      spriteId: ce5e070f3400880498f7d43e76d5d62f
+    - name: Frame_2
+      frameIndex: 2
+      additiveSortOrder: 0
+      cellRect:
         x: 4
-        y: 24
-        width: 55
-        height: 15
-      spriteId: b3c30899edd803d48853bfcc8e249e72
+        y: 0
+        width: 42
+        height: 64
+      spriteId: df41cbfa338ea8742895fa34cbf8cc77
     linkedCells: []
     parentIndex: -1
   platformSettings:
