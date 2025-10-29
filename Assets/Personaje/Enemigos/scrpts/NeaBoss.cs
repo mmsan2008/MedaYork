@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class BossNea : MonoBehaviour
 {
@@ -9,11 +8,9 @@ public class BossNea : MonoBehaviour
     public Slider healthBar;
     public GameObject smokePrefab;
     public GameObject knifePrefab;
-    public Transform attackPoint;
+    public HealthSystem healthSystem; // Tu sistema de vida
 
-    [Header("Stats")]
-    public float maxHealth = 1000f;
-    public float currentHealth;
+    [Header("Stats de Movimiento")]
     public float moveSpeed = 2f;
     public float chargeSpeed = 8f;
 
@@ -21,6 +18,7 @@ public class BossNea : MonoBehaviour
     public float minX = -8f;
     public float maxX = 8f;
     public float attackCooldown = 3f;
+    public float damage = 10;
 
     private BossState currentState = BossState.Moving;
     private float direction = -1f;
@@ -29,21 +27,33 @@ public class BossNea : MonoBehaviour
     private float attackPhaseTimer = 0f;
     private bool isFacingRight = false;
 
-    private enum BossState
-    {
-        Moving,
-        Attacking,
-        Charging
-    }
+    private enum BossState { Moving, Attacking, Charging }
+
+    // ------------------------------------------------------------
 
     void Start()
     {
-        currentHealth = maxHealth;
-        UpdateHealthBar();
+        // Obtener el HealthSystem automáticamente si no está asignado
+        if (healthSystem == null)
+            healthSystem = GetComponent<HealthSystem>();
+
+        // Suscribirse a eventos del sistema de vida
+        if (healthSystem != null)
+        {
+            healthSystem.onHealthChanged.AddListener(UpdateHealthBar);
+            healthSystem.onDeath.AddListener(OnBossDeath);
+            UpdateHealthBar(healthSystem.CurrentHealth);
+        }
     }
+
+    // ------------------------------------------------------------
 
     void Update()
     {
+        // Si está muerto, no hacer nada
+        if (healthSystem != null && healthSystem.IsDead)
+            return;
+
         attackTimer -= Time.deltaTime;
 
         switch (currentState)
@@ -62,6 +72,10 @@ public class BossNea : MonoBehaviour
         FlipSprite();
     }
 
+    // ------------------------------------------------------------
+    // MOVIMIENTO
+    // ------------------------------------------------------------
+
     void HandleMovement()
     {
         // Mover de izquierda a derecha
@@ -69,42 +83,33 @@ public class BossNea : MonoBehaviour
 
         // Cambiar dirección en los límites
         if (transform.position.x <= minX || transform.position.x >= maxX)
-        {
             direction *= -1f;
-        }
 
         // Decidir si atacar
         if (attackTimer <= 0)
-        {
             StartAttack();
-        }
     }
+
+    // ------------------------------------------------------------
+    // ATAQUES
+    // ------------------------------------------------------------
 
     void StartAttack()
     {
         currentState = BossState.Attacking;
         attackPhaseTimer = 0f;
 
-        // Elegir ataque aleatorio
         int attackIndex = Random.Range(0, 3);
         switch (attackIndex)
         {
-            case 0:
-                currentAttack = "smoke";
-                break;
-            case 1:
-                currentAttack = "knives";
-                break;
-            case 2:
-                currentAttack = "charge";
-                break;
+            case 0: currentAttack = "smoke"; break;
+            case 1: currentAttack = "knives"; break;
+            case 2: currentAttack = "charge"; break;
         }
 
         // Mirar hacia el jugador
         if (player != null)
-        {
             direction = player.position.x > transform.position.x ? 1f : -1f;
-        }
 
         Debug.Log("Boss usa ataque: " + currentAttack);
     }
@@ -115,90 +120,90 @@ public class BossNea : MonoBehaviour
 
         switch (currentAttack)
         {
-            case "smoke":
-                ExecuteSmokeAttack();
-                break;
-            case "knives":
-                ExecuteKnivesAttack();
-                break;
-            case "charge":
-                ExecuteChargeAttack();
-                break;
+            case "smoke": ExecuteSmokeAttack(); break;
+            case "knives": ExecuteKnivesAttack(); break;
+            case "charge": ExecuteChargeAttack(); break;
         }
     }
 
+    // ---------------------
+    // ATAQUE DE HUMO
+    // ---------------------
     void ExecuteSmokeAttack()
     {
-        // Humo arriba en 0.5 segundos
         if (attackPhaseTimer >= 0.5f && attackPhaseTimer < 0.6f)
-        {
-            SpawnSmoke(true); // true = arriba
-        }
-
-        // Humo abajo en 1.5 segundos
+            SpawnSmoke(true); // Humo arriba
         if (attackPhaseTimer >= 1.5f && attackPhaseTimer < 1.6f)
-        {
-            SpawnSmoke(false); // false = abajo
-        }
+            SpawnSmoke(false); // Humo abajo
 
-        // Terminar ataque
         if (attackPhaseTimer >= 3f)
-        {
             EndAttack();
-        }
     }
 
     void SpawnSmoke(bool isTop)
     {
-        if (smokePrefab != null)
-        {
-            float yPos = isTop ? 3f : -3f;
-            GameObject smoke = Instantiate(smokePrefab, new Vector3(minX - 1f, yPos, 0), Quaternion.identity);
-            smoke.GetComponent<SmokeProjectile>().Initialize(isTop);
-        }
+        if (smokePrefab == null) return;
+
+        float yPos = isTop ? 3f : -3f;
+        GameObject smoke = Instantiate(smokePrefab, new Vector3(minX - 1f, yPos, 0), Quaternion.identity);
+
+        SmokeProjectile smokeScript = smoke.GetComponent<SmokeProjectile>();
+        if (smokeScript != null)
+            smokeScript.Initialize(isTop);
     }
 
+    // ---------------------
+    // ATAQUE DE CUCHILLOS
+    // ---------------------
     void ExecuteKnivesAttack()
     {
-        // Lanzar cuchillos en 0.5 segundos
         if (attackPhaseTimer >= 0.5f && attackPhaseTimer < 0.6f)
-        {
             SpawnKnives();
-        }
 
-        // Terminar ataque
         if (attackPhaseTimer >= 2.5f)
-        {
             EndAttack();
-        }
     }
 
     void SpawnKnives()
     {
-        if (knifePrefab != null)
-        {
-            // Crear patrón de cuchillos con huecos aleatorios
-            int gap1 = Random.Range(1, 4);
-            int gap2 = Random.Range(5, 8);
+        if (knifePrefab == null) return;
 
-            for (int i = 0; i < 8; i++)
-            {
-                if (i != gap1 && i != gap2)
-                {
-                    float xPos = minX + (maxX - minX) * (i / 7f);
-                    Instantiate(knifePrefab, new Vector3(xPos, 6f, 0), Quaternion.identity);
-                }
-            }
+        int gap1 = Random.Range(1, 4);
+        int gap2 = Random.Range(5, 8);
+
+        for (int i = 0; i < 8; i++)
+        {
+            if (i == gap1 || i == gap2) continue;
+
+            float xPos = Mathf.Lerp(minX, maxX, i / 7f);
+            Instantiate(knifePrefab, new Vector3(xPos, 6f, 0), Quaternion.identity);
         }
     }
 
+    // ---------------------
+    // ATAQUE DE CARGA
+    // ---------------------
     void ExecuteChargeAttack()
     {
-        // Cambiar a estado de carga inmediatamente
         if (attackPhaseTimer >= 0.5f && attackPhaseTimer < 0.6f)
         {
             currentState = BossState.Charging;
             attackPhaseTimer = 0f;
+        }
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            HealthSystem playerHealth = other.GetComponent<HealthSystem>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+            }
+
+
         }
     }
 
@@ -206,16 +211,12 @@ public class BossNea : MonoBehaviour
     {
         attackPhaseTimer += Time.deltaTime;
 
-        // Moverse rápido
         transform.position += Vector3.right * direction * chargeSpeed * Time.deltaTime;
 
-        // Rebotar en los bordes
         if (transform.position.x <= minX || transform.position.x >= maxX)
-        {
             direction *= -1f;
-        }
 
-        // Verificar colisión con jugador
+        // Daño al jugador si está cerca
         if (player != null)
         {
             float distance = Vector2.Distance(transform.position, player.position);
@@ -223,18 +224,17 @@ public class BossNea : MonoBehaviour
             {
                 HealthSystem playerHealth = player.GetComponent<HealthSystem>();
                 if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(25);
-                }
+                    playerHealth.TakeDamage(25, transform);
             }
         }
 
-        // Terminar carga después de 3 segundos
         if (attackPhaseTimer >= 3f)
-        {
             EndAttack();
-        }
     }
+
+    // ------------------------------------------------------------
+    // UTILIDADES
+    // ------------------------------------------------------------
 
     void EndAttack()
     {
@@ -254,37 +254,50 @@ public class BossNea : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage)
-    {
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth);
-        UpdateHealthBar();
+    // ------------------------------------------------------------
+    // VIDA
+    // ------------------------------------------------------------
 
-        if (currentHealth <= 0)
+    void UpdateHealthBar(float currentHealth)
+    {
+        if (healthBar == null || healthSystem == null) return;
+
+        healthBar.value = healthSystem.HealthPercentage;
+
+        Image fillImage = healthBar.fillRect.GetComponent<Image>();
+        if (fillImage != null)
         {
-            Die();
+            if (healthSystem.HealthPercentage > 0.5f)
+                fillImage.color = new Color(1f, 0.3f, 0.3f); // Rojo claro
+            else if (healthSystem.HealthPercentage > 0.25f)
+                fillImage.color = new Color(1f, 0.5f, 0f);   // Naranja
+            else
+                fillImage.color = Color.red;                // Rojo oscuro
         }
     }
 
-    void UpdateHealthBar()
+    void OnBossDeath()
     {
-        if (healthBar != null)
-        {
-            healthBar.value = currentHealth / maxHealth;
-        }
+        Debug.Log("¡Boss Nea ha sido derrotado!");
+        // Aquí puedes agregar lógica adicional: victoria, recompensas, etc.
     }
 
-    void Die()
-    {
-        Debug.Log("¡Boss derrotado!");
-        // Aquí puedes agregar animación de muerte, drop de items, etc.
-        Destroy(gameObject);
-    }
+    // ------------------------------------------------------------
+    // DEBUG
+    // ------------------------------------------------------------
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(new Vector3(minX, transform.position.y, 0),
-                       new Vector3(maxX, transform.position.y, 0));
+        Gizmos.DrawLine(new Vector3(minX, transform.position.y, 0), new Vector3(maxX, transform.position.y, 0));
+    }
+
+    void OnDestroy()
+    {
+        if (healthSystem != null)
+        {
+            healthSystem.onHealthChanged.RemoveListener(UpdateHealthBar);
+            healthSystem.onDeath.RemoveListener(OnBossDeath);
+        }
     }
 }
